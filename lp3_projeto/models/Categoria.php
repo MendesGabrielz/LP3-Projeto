@@ -15,7 +15,7 @@ class Categoria
     public function listar()
     {
 
-        $stnt = $this->db->query("select * from categorias order by id desc");
+        $stnt = $this->db->query("select * from categorias order by id asc");
 
         return $stnt->fetchALL();
     }
