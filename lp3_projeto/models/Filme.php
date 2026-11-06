@@ -20,7 +20,7 @@ class Filme
         return $stnt->fetchALL();
     }
 
-    public function salvar(string $filme, string $diretor, int $duracao, string $imagem)
+    public function salvar(string $filme, string $diretor, int $duracao, ?string $imagem)
         {
 
             $sql = "insert into filmes (filme, diretor, duracao, imagem) values (:filme, :diretor, :duracao, :imagem)";
@@ -37,7 +37,7 @@ class Filme
             return $stnt->execute($values);
         }
 
-        public function atualizar(string $filme, string $diretor, int $duracao, string $imagem, int $id)
+        public function atualizar(string $filme, string $diretor, int $duracao, ?string $imagem, int $id)
         {
 
             $sql = "UPDATE filmes SET filme = :filme, diretor = :diretor, duracao = :duracao, imagem = :imagem WHERE id = :id";

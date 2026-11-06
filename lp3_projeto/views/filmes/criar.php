@@ -8,7 +8,7 @@
             <h3>Cadastrar Novo Filme</h3>
         </div>
 
-        <form action="/lp3_projeto/filmes/adicionar" method="POST" class="card-form">
+        <form action="/lp3_projeto/filmes/adicionar" method="POST" class="card-form" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="filme">Nome do filme:</label>
                 <input type="text" id="filme" name="filme" required class="form-control" placeholder="Ex: Teste">
@@ -25,9 +25,14 @@
                 <input type="number" id="duracao" name="duracao" required class="form-control" placeholder="Ex: 100">
             </div>
 
+
             <div class="form-group">
-                <label for="imagem">Imagem:</label>
-                <input type="text" id="imagem" name="imagem" required class="form-control" placeholder="Ex: Sla">
+                <label for="imagem">Imagem do Filme:</label>
+                <input type="file" id="imagem"
+                    name="imagem"
+                    required
+                    class="form-control"
+                    accept="image/jpeg,image/png,image/webp">
             </div>
 
             <div class="mt-3 d-flex gap-2">

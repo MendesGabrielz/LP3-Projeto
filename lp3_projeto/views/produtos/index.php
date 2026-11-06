@@ -28,7 +28,7 @@
                             <td><?= htmlspecialchars($produto['produto']) ?></td>
                             <td><?= htmlspecialchars($produto['valor']) ?></td>
                             <td><?= htmlspecialchars($produto['descricao']) ?></td>
-                            <td><?= htmlspecialchars($produto['categoria_id'] ?? '') ?></td>
+                            <td><?= htmlspecialchars($produto['categoria_nome'] ?? '') ?></td>
                             <td class="text-center">
                                 <a href="/lp3_projeto/produtos/editar?id=<?= $produto['id'] ?>" class="btn btn-warning btn-sm">Editar</a>
 

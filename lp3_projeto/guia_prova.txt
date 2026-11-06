@@ -1,0 +1,310 @@
+GUIA RÁPIDO PARA A PROVA - CRUD EM PHP (MVC)
+Exemplos baseados neste projeto (lp3_projeto).
+
+
+============================================================
+1. ORDEM PARA FAZER (testando a cada etapa)
+============================================================
+
+ 1. Criar a tabela no banco (anote os nomes EXATOS das colunas)
+ 2. Model
+ 3. Controller
+ 4. Rotas no index.php (as 4: lista, adicionar, editar, excluir)
+ 5. Link no views/layout/nav.php
+ 6. View index   -> abrir no navegador e testar
+ 7. View criar   -> cadastrar um registro e testar
+ 8. View editar  -> editar o registro e testar
+ 9. Excluir      -> testar por último
+
+Não escreva tudo para testar só no final. Um erro por vez é fácil
+de achar; dez erros juntos consomem a prova inteira.
+
+
+============================================================
+2. O MAIOR GANHO DE TEMPO: COPIAR UM CRUD PRONTO
+============================================================
+
+Não escreva do zero. Copie o CRUD mais parecido com o que a prova pede:
+
+  Só campos simples ............ categorias
+  Com imagem ................... filmes
+  Com select (chave estrangeira) produtos
+  Com imagem + select .......... livros
+
+Passos, usando "carro" como exemplo:
+
+  1. Copie os arquivos e renomeie:
+       models/Filme.php                -> models/Carro.php
+       controllers/FilmeController.php -> controllers/CarroController.php
+       views/filmes/                   -> views/carros/
+
+  2. No VS Code, Ctrl+Shift+H, com o botão "Aa" LIGADO (diferencia
+     maiúsculas), só nesses arquivos:
+       Filme -> Carro
+       filme -> carro      (também troca "filmes" por "carros")
+     Plural irregular (animal/animais): troque o plural PRIMEIRO.
+
+  3. Troque os campos (diretor, duracao...) pelos da prova.
+
+Atalhos úteis:
+  Ctrl+D ......... seleciona a próxima ocorrência da palavra
+  Alt+Shift+Baixo. duplica a linha ou o bloco selecionado
+  Ctrl+P ......... abre arquivo pelo nome
+
+
+============================================================
+3. A REGRA QUE EVITA A MAIORIA DOS ERROS
+============================================================
+
+O mesmo nome de campo aparece em 5 lugares e precisa ser IGUAL:
+
+  Tabela ......... coluna  placa
+  Model .......... :placa  e  "placa" => $placa
+  Controller ..... filter_input(INPUT_POST, 'placa', ...)
+  View (form) .... name="placa"
+  View (lista) ... $carro['placa']
+
+No Model, a ordem dos parâmetros precisa bater com a chamada no
+Controller. Neste projeto cada um está de um jeito:
+  Filme:   atualizar($filme, $diretor, $duracao, $imagem, $id)  id no fim
+  Livro:   atualizar($id, $titulo, $autor, ...)                 id no início
+Olhe a assinatura antes de chamar.
+
+
+============================================================
+4. VIEWS: COMO FAZER RÁPIDO
+============================================================
+
+Todas têm a mesma "casca". Só o miolo muda:
+
+  <?php include __DIR__ . '/../layout/header.php'; ?>
+  <div class="page-layout">
+      <?php include __DIR__ . '/../layout/nav.php'; ?>
+      <div class="content-panel">
+
+          ... MIOLO ...
+
+      </div>
+  </div>
+  <?php include __DIR__ . '/../layout/footer.php'; ?>
+
+--- INDEX (lista) ------------------------------------------
+
+Só 3 coisas mudam: os <th>, os <td> e o colspan (= total de colunas).
+
+  <div class="header-action">
+      <h3>Carros</h3>
+      <a href="/lp3_projeto/carros/adicionar" class="btn btn-success btn-sm">+ Novo</a>
+  </div>
+  <table class="table table-striped">
+    <thead><tr>
+      <th>ID</th> <th>Placa</th> <th class="text-center">Ações</th>
+    </tr></thead>
+    <tbody>
+    <?php if (!empty($carros)): ?>
+      <?php foreach ($carros as $carro): ?>
+        <tr>
+          <td><?= $carro['id'] ?></td>
+          <td><?= htmlspecialchars($carro['placa'] ?? '') ?></td>
+          <td class="text-center">
+            <a href="/lp3_projeto/carros/editar?id=<?= $carro['id'] ?>" class="btn btn-warning btn-sm">Editar</a>
+            <a href="/lp3_projeto/carros/excluir?id=<?= $carro['id'] ?>" class="btn btn-danger btn-sm"
+               onclick="return confirm('Excluir este carro?');">Excluir</a>
+          </td>
+        </tr>
+      <?php endforeach; ?>
+    <?php else: ?>
+      <tr><td colspan="3" style="text-align:center;">Nada cadastrado.</td></tr>
+    <?php endif; ?>
+    </tbody>
+  </table>
+
+--- CRIAR (formulário) -------------------------------------
+
+Faça UM campo, duplique com Alt+Shift+Baixo e troque o nome.
+
+  <form action="/lp3_projeto/carros/adicionar" method="POST" class="card-form">
+      <div class="form-group">
+          <label for="placa">Placa:</label>
+          <input type="text" id="placa" name="placa" required class="form-control">
+      </div>
+      <div class="mt-3 d-flex gap-2">
+          <button type="submit" class="btn btn-success">Salvar</button>
+          <a href="/lp3_projeto/carros" class="btn btn-secondary">Voltar</a>
+      </div>
+  </form>
+
+--- EDITAR = CRIAR + 3 MUDANÇAS -----------------------------
+
+Copie o criar.php inteiro e altere:
+
+  1. action com o id:
+     action="/lp3_projeto/carros/editar?id=<?= $carro['id'] ?>"
+  2. value em cada campo:
+     value="<?= htmlspecialchars($carro['placa'] ?? '') ?>"
+  3. Título e botão: "Editar" / "Atualizar".
+
+--- COMO FICA CADA TIPO DE CAMPO ----------------------------
+
+  Tipo        No criar                    No editar, acrescente
+  ----------  --------------------------  -----------------------------
+  Texto       type="text"                 value="<?= ... ?>"
+  Inteiro     type="number"               value="<?= ... ?>"
+  Decimal     type="number" step="0.01"   value="<?= ... ?>"
+  Data        type="date"                 value="<?= ... ?>" (AAAA-MM-DD)
+
+  Textarea: o valor fica ENTRE as tags, não em value=
+    <textarea name="sinopse" class="form-control"><?= htmlspecialchars($carro['sinopse'] ?? '') ?></textarea>
+
+--- SELECT (chave estrangeira) ------------------------------
+
+Na view editar (no criar, é só tirar a parte do selected):
+
+  <select name="categoria_id" required class="form-control">
+      <option value="">Selecione</option>
+      <?php foreach ($categorias as $cat): ?>
+          <option value="<?= $cat['id'] ?>" <?= $carro['categoria_id'] == $cat['id'] ? 'selected' : '' ?>>
+              <?= htmlspecialchars($cat['categoria']) ?>
+          </option>
+      <?php endforeach; ?>
+  </select>
+
+O select só funciona com estas 3 coisas no Controller:
+
+  // 1. no __construct
+  $this->categoriaModel = new Categoria();
+
+  // 2. em adicionar() E editar(), FORA do if do POST, antes do require
+  $categorias = $this->categoriaModel->listar();
+  require_once __DIR__ . '/../views/carros/criar.php';
+
+Para a lista mostrar o NOME em vez do id, use JOIN no listar() do Model:
+
+  SELECT carros.*, categorias.categoria AS categoria_nome
+  FROM carros
+  LEFT JOIN categorias ON categorias.id = carros.categoria_id
+  ORDER BY carros.id DESC
+
+  Na view: <?= htmlspecialchars($carro['categoria_nome'] ?? '') ?>
+
+--- IMAGEM --------------------------------------------------
+
+  No <form> (criar E editar):  enctype="multipart/form-data"
+  Campo:     <input type="file" name="imagem" class="form-control" accept="image/*">
+  Na lista:  <img src="/lp3_projeto/uploads/carros/<?= htmlspecialchars($carro['imagem']) ?>" style="width:50px">
+
+Copie processarImagem() do FilmeController e troque só a pasta.
+No editar, passe a imagem atual para ela não se perder sem novo envio:
+  $this->processarImagem($_FILES['imagem'] ?? null, $carroAtual['imagem'] ?? null);
+
+
+============================================================
+5. ERROS MAIS COMUNS: SINTOMA -> CAUSA
+============================================================
+
+O FORMULÁRIO SÓ RECARREGA, SEM SALVAR E SEM ERRO
+  É o mais comum: o if do Controller reprovou. Causas:
+  - name do input diferente do filter_input.
+  - O if exige um campo que o form não obriga (ex.: exige imagem, mas
+    o input não tem required, ou o upload falhou).
+  - Valor 0: if ($valor) trata 0 como falso. Se 0 for válido, compare
+    com $valor !== false && $valor !== null.
+  - Decimal em campo validado com FILTER_VALIDATE_INT.
+    Dinheiro usa FILTER_VALIDATE_FLOAT.
+
+IMAGEM NÃO SALVA
+  - Faltou enctype no <form> (o erro nº 1).
+  - name do input diferente da chave em $_FILES['imagem'].
+  - Arquivo maior que o limite do PHP (upload_max_filesize, em geral 2MB).
+    Teste com uma imagem pequena.
+
+MENSAGENS DE ERRO
+  "Página não encontrada"          Rota não está no index.php, ou
+                                   tem barra no fim (/carros/).
+  404 do Apache em todas as rotas  .htaccess ausente, mod_rewrite
+                                   desligado, ou a pasta não se chama
+                                   lp3_projeto.
+  Class "Carro" not found          Nome do arquivo diferente do nome
+                                   da classe, ou fora da pasta certa.
+  Undefined variable $categorias   Controller não criou a variável
+                                   antes do require da view.
+  foreach() argument must be array Mesmo caso: a lista não foi enviada.
+  Undefined array key "placa"      Coluna com outro nome no banco.
+  Illegal string offset /          Variável sobrescrita: $carro era o
+  Cannot access offset             registro e virou texto (seção 6).
+  Column not found / Unknown       Nome de coluna errado no SQL do
+  column (42S22)                   Model.
+  Base table not found (42S02)     Tabela não criada, ou nome errado.
+  Invalid parameter number (HY093) :campo no SQL sem par no array, ou
+                                   o inverso. Procure vírgula e nome.
+  Argument must be of type string, Campo opcional veio null. Use
+  null given (TypeError)           ?string no parâmetro do Model.
+  Passing null to htmlspecialchars Coluna vazia. Use ?? '' dentro.
+  Cannot delete a parent row       Tentou excluir categoria que ainda
+  (1451)                           tem produto vinculado.
+  Cannot modify header information Saída (echo, var_dump ou espaço)
+                                   antes do header().
+
+ERROS DE COPIAR E COLAR (não dão mensagem, mas perdem nota)
+  - Link ou action apontando para o CRUD antigo.
+  - Texto antigo na tela: h3, label, "Excluir este cliente?".
+  - colspan com número errado.
+  - Faltou o id no action do editar (salva nada e volta para a lista).
+  - Faltou exit depois do header('Location: ...').
+
+
+============================================================
+6. CUIDADO COM NOME DE VARIÁVEL
+============================================================
+
+Variável com o mesmo nome se sobrescreve sem avisar:
+
+  ERRADO: foreach ($livros as $livro)  dentro do editar, onde $livro já
+          é o registro sendo editado. O registro se perde.
+  CERTO:  o nome do foreach é diferente:  foreach ($generos as $genero)
+
+No Controller editar, use nomes separados para o registro do banco e os
+valores do POST (é por isso que o FilmeController usa $filmeAtual):
+
+  $carroAtual = $this->model->buscarPorId($id);   // array do banco
+  $carro = filter_input(INPUT_POST, 'carro', ...); // texto do form
+
+
+============================================================
+7. COMO ACHAR UM ERRO EM MENOS DE 1 MINUTO
+============================================================
+
+Página em branco? Coloque no topo do index.php:
+  ini_set('display_errors', 1);
+  error_reporting(E_ALL);
+
+Formulário não salva? Coloque como primeira linha dentro do
+if do POST, no Controller:
+  var_dump($_POST, $_FILES); exit;
+  - Campo não aparece ........ problema no name do form.
+  - Campo aparece certo ...... problema no Controller ou no Model.
+
+Dado errado na tela? Antes do require da view:
+  var_dump($carros); exit;
+
+Leia a mensagem: ela informa o ARQUIVO e a LINHA. Vá direto lá.
+Lembre de apagar os var_dump depois.
+
+
+============================================================
+8. CHECKLIST ANTES DE ENTREGAR
+============================================================
+
+  [ ] Cadastrar, com e sem campos opcionais
+  [ ] Editar SEM trocar a imagem (ela continua lá?)
+  [ ] Editar trocando a imagem
+  [ ] O select vem com a opção certa marcada no editar?
+  [ ] Excluir
+  [ ] Link no menu funciona
+  [ ] Nenhum texto do CRUD antigo na tela
+  [ ] Nenhum var_dump esquecido
+  [ ] SQL da tabela incluído na entrega, se a prova pedir
+
+Tempo curto? Faça primeiro listar e cadastrar funcionando, depois
+excluir (é o mais rápido de fazer), depois editar. Deixe visual e
+detalhes para o final.

@@ -13,7 +13,12 @@ class Produto
     public function listar()
     {
 
-        $stnt = $this->db->query("select * from produtos order by id desc");
+        $sql = "SELECT produtos.*, categorias.categoria AS categoria_nome
+                FROM produtos
+                LEFT JOIN categorias ON categorias.id = produtos.categoria_id
+                ORDER BY produtos.id DESC";
+
+        $stnt = $this->db->query($sql);
 
         return $stnt->fetchALL();
     }

@@ -29,14 +29,22 @@
                             <td><?= htmlspecialchars($film['filme']) ?></td>
                             <td><?= htmlspecialchars($film['diretor']) ?></td>
                             <td><?= htmlspecialchars($film['duracao']) ?></td>
-                            <td><?= htmlspecialchars($film['imagem']) ?></td>
+                            <td>
+                                <?php if (!empty($film['imagem'])): ?>
+                                    <img src="/lp3_projeto/uploads/filmes/<?= htmlspecialchars($film['imagem']) ?>"
+                                        alt="Capa de <?= htmlspecialchars($film['filme']) ?>"
+                                        style="width: 50px; height: 70px; object-fit: cover; border-radius: 4px;">
+                                <?php else: ?>
+                                    <span class="text-muted">Sem capa</span>
+                                <?php endif; ?>
+                            </td>
 
                             <td class="text-center">
                                 <a href="/lp3_projeto/filmes/editar?id=<?= $film['id'] ?>" class="btn btn-warning btn-sm">Editar</a>
 
                                 <a href="/lp3_projeto/filmes/excluir?id=<?= $film['id'] ?>"
                                     class="btn btn-danger btn-sm"
-                                    onclick="return confirm('Tem certeza que deseja excluir este cliente?');">
+                                    onclick="return confirm('Tem certeza que deseja excluir este filme?');">
                                     Excluir
                                 </a>
                             </td>
@@ -44,7 +52,7 @@
                     <?php endforeach; ?>
                 <?php else: ?>
                     <tr>
-                        <td colspan="9" style="text-align: center;">Nenhum filme cadastrado.</td>
+                        <td colspan="6" style="text-align: center;">Nenhum filme cadastrado.</td>
                     </tr>
                 <?php endif; ?>
             </tbody>
